@@ -1,3 +1,4 @@
+import urllib.request
 import random
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
@@ -12,85 +13,65 @@ class JarvisApp(App):
     def build(self):
         Window.clearcolor = (0, 0, 0, 1)
         self.layout = FloatLayout()
+        
+        # Hafızadaki varsayılan cevaplar
+        self.hafiza = {
+            "selam": "Merhaba efendim.",
+            "durum": "Sistemler stabil."
+        }
 
-        # 1. DÖNEN HOLOGRAM (jarvis.png)
-        self.hologram = Image(
-            source='jarvis.png', 
-            pos_hint={'center_x': 0.5, 'center_y': 0.55}, 
-            size_hint=(0.75, 0.75)
-        )
+        # 1. DÖNEN HOLOGRAM
+        self.hologram = Image(source='jarvis.png', pos_hint={'center_x': 0.5, 'center_y': 0.55}, size_hint=(0.75, 0.75))
         self.layout.add_widget(self.hologram)
 
-        # 2. SİSTEM VERİ PANELİ
-        self.info = Label(
-            text="STATUS: ONLINE\nUPTIME: ACTIVE\nLEARNING: ENABLED",
-            font_size='12sp', color=(0, 1, 1, 0.5),
-            pos_hint={'center_x': 0.15, 'center_y': 0.95}
-        )
-        self.layout.add_widget(self.info)
-
-        # 3. MESAJ GİRİŞ KUTUSU
-        self.input_box = TextInput(
-            hint_text='Emrinizi buraya yazın...',
-            size_hint=(0.8, 0.06),
-            pos_hint={'center_x': 0.5, 'center_y': 0.1},
-            background_color=(0, 0, 0, 0.7),
-            foreground_color=(0, 1, 1, 1),
-            multiline=False
-        )
-        self.input_box.bind(on_text_validate=self.jarvis_islem)
-        self.layout.add_widget(self.input_box)
-
-        # 4. CEVAP EKRANI
-        self.status = Label(
-            text="Sistem emirlerinizi bekliyor.",
-            font_size='18sp',
-            color=(1, 1, 1, 0.8),
-            pos_hint={'center_x': 0.5, 'center_y': 0.2}
-        )
+        # 2. DURUM PANELİ
+        self.status = Label(text="Jarvis Çekirdek Aktif.", pos_hint={'center_x': 0.5, 'center_y': 0.22}, color=(0, 1, 1, 1))
         self.layout.add_widget(self.status)
 
+        # 3. GİRİŞ KUTUSU
+        self.input_box = TextInput(hint_text='Emir bekleniyor...', size_hint=(0.8, 0.06), pos_hint={'center_x': 0.5, 'center_y': 0.1}, background_color=(0,0,0,0.7), foreground_color=(0,1,1,1), multiline=False)
+        self.input_box.bind(on_text_validate=self.islem_yap)
+        self.layout.add_widget(self.input_box)
+
+        # AÇILIŞTA GÜNCELLEMEYİ BAŞLAT
+        Clock.schedule_once(self.buluttan_ogren, 2)
         Clock.schedule_interval(self.dondur, 1.0 / 60.0)
         return self.layout
 
     def dondur(self, dt):
         self.hologram.rotation += 1
 
+    def buluttan_ogren(self, dt):
+        # BURASI ÖNEMLİ: Kendi GitHub kullanıcı adınızı "Huseyin" yazan yere yazın
+        # GitHub'da 'komutlar.txt' diye bir dosya açıp içine selam:merhaba gibi yazacağız
+        url = "https://raw.githubusercontent.com/Huseyin/jarvis/main/komutlar.txt"
+        try:
+            response = urllib.request.urlopen(url)
+            data = response.read().decode('utf-8')
+            # Gelen veriyi hafızaya ekle (Örn: "naber:iyiyim,fener:açıldı")
+            for line in data.split(','):
+                k, v = line.split(':')
+                self.hafiza[k.strip().lower()] = v.strip()
+            self.status.text = "Yeni protokoller başarıyla indirildi."
+            self.sesli_konus("Sistem güncellendi efendim.")
+        except:
+            self.status.text = "Bulut bağlantısı kurulamadı."
+
     def sesli_konus(self, mesaj):
-        # Android'in kendi sesini (TTS) tetikleyen motor
         try:
             Locale = autoclass('java.util.Locale')
             TextToSpeech = autoclass('android.speech.tts.TextToSpeech')
             PythonActivity = autoclass('org.kivy.android.PythonActivity')
-            
-            # Ses motoru başlatılıyor
             self.tts = TextToSpeech(PythonActivity.mActivity, None)
             self.tts.setLanguage(Locale.getDefault())
             self.tts.speak(mesaj, TextToSpeech.QUEUE_FLUSH, None, None)
-        except:
-            print("Mobil ses hatası.")
-
-    def jarvis_islem(self, instance):
-        soru = self.input_box.text
-        self.input_box.text = ""
-        
-        # Titreşim (Onay)
-        try:
-            PythonActivity = autoclass('org.kivy.android.PythonActivity')
-            Context = autoclass('android.content.Context')
-            vibrator = PythonActivity.mActivity.getSystemService(Context.VIBRATOR_SERVICE)
-            vibrator.vibrate(100)
         except: pass
 
-        # ÖĞRENME VE YANIT MANTIĞI (Burayı istediğin gibi çoğaltabilirsin)
-        veritabani = {
-            "selam": "Merhaba efendim, tüm sistemler hazır.",
-            "nasılsın": "Çekirdek hızım stabil, sizin için en iyi performansta çalışıyorum.",
-            "saat kaç": "Sistem saati kontrol ediliyor, ekranın sol üstüne bakabilirsiniz.",
-            "kimsin": "Ben sizin tarafınızdan tasarlanan en gelişmiş Jarvis çekirdeğiyim."
-        }
+    def islem_yap(self, instance):
+        soru = self.input_box.text.lower()
+        self.input_box.text = ""
         
-        yanit = veritabani.get(soru.lower(), "Bunu veri tabanımda bulamadım ama öğrenmeye çalışıyorum.")
+        yanit = self.hafiza.get(soru, "Bu komut hafızamda yok efendim.")
         self.status.text = yanit
         self.sesli_konus(yanit)
 
