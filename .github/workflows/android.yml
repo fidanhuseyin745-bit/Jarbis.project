@@ -4,14 +4,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Build with Buildozer
-        uses: Digas99/buildozer-action@v1
+        uses: kuzat/buildozer-action@v1
         with:
           command: buildozer android debug
-
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
