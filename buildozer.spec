@@ -1,18 +1,18 @@
 [app]
-title = Jarvis Huseyin
-package.name = jarvis_huseyin
+title = Jarvis Core
+package.name = jarvis_core
 package.domain = org.huseyin
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,mp4
-version = 0.1
+version = 1.0
 
-# BURASI ÇOK ÖNEMLİ: pyjnius ekledik!
-requirements = python3,kivy,pyjnius
+# Gerekli kütüphaneler (Güncelleme ve Android erişimi için)
+requirements = python3,kivy,pyjnius,requests
 
 orientation = portrait
 
-# YETKİLER: Titreşim ve Fener için
-android.permissions = VIBRATE, CAMERA, FLASHLIGHT
+# ANDROID İZİNLERİ (Burayı ekledik)
+android.permissions = INTERNET, VIBRATE, CAMERA, FLASHLIGHT
 
 android.archs = arm64-v8a, armeabi-v7a
 android.allow_backup = True
