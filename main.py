@@ -1,38 +1,45 @@
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.image import Image
 from kivy.uix.label import Label
-from kivy.uix.button import Button
+from kivy.clock import Clock
 from kivy.core.window import Window
 
 class JarvisApp(App):
     def build(self):
-        # Arka planı koyu bir mavi yapalım
-        Window.clearcolor = (0, 0.05, 0.1, 1)
+        # Arka plan rengini tamamen siyah yapıyoruz
+        Window.clearcolor = (0, 0, 0, 1)
         
-        layout = BoxLayout(orientation='vertical', padding=50, spacing=20)
-        
-        # Başlık
-        self.label = Label(
-            text="JARVIS SISTEMI AKTIF",
-            font_size='30sp',
-            color=(0, 0.8, 1, 1) # Neon Mavi
-        )
-        
-        # Etkileşimli bir buton
-        btn = Button(
-            text="KOMUT VER",
-            size_hint=(1, 0.2),
-            background_color=(0, 0.5, 0.8, 1)
-        )
-        btn.bind(on_press=self.komut_al)
-        
-        layout.add_widget(self.label)
-        layout.add_widget(btn)
-        
-        return layout
+        self.layout = FloatLayout()
 
-    def komut_al(self, instance):
-        self.label.text = "Sizi dinliyorum Hüseyin Bey..."
+        # 1. HOLOGRAM RESMİ (Dönen kısım)
+        # Buradaki 'hologram.png' isminin GitHub'a yüklediğiniz resimle AYNI olduğundan emin olun!
+        self.hologram = Image(
+            source='hologram.png', 
+            pos_hint={'center_x': 0.5, 'center_y': 0.5},
+            size_hint=(0.8, 0.8)
+        )
+        self.layout.add_widget(self.hologram)
+
+        # 2. YAZI KATMANI
+        self.status_label = Label(
+            text="[b]JARVIS CORE AKTİF[/b]",
+            markup=True,
+            font_size='24sp',
+            color=(0, 0.8, 1, 1),
+            pos_hint={'center_x': 0.5, 'center_y': 0.15}
+        )
+        self.layout.add_widget(self.status_label)
+
+        # HAREKETİ BAŞLAT: Her saniye 60 kez resmi döndür
+        Clock.schedule_interval(self.dondur, 1.0 / 60.0)
+        
+        return self.layout
+
+    def dondur(self, dt):
+        # Resmi her karede 1 derece döndürür
+        self.hologram.rotation += 1
 
 if __name__ == "__main__":
     JarvisApp().run()
+
