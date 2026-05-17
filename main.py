@@ -7,39 +7,38 @@ from kivy.core.window import Window
 
 class JarvisApp(App):
     def build(self):
-        # Arka plan rengini tamamen siyah yapıyoruz
+        # Arka planı tamamen siyah yapıyoruz ki hologram parlasın
         Window.clearcolor = (0, 0, 0, 1)
         
         self.layout = FloatLayout()
 
-        # 1. HOLOGRAM RESMİ (Dönen kısım)
-        # Buradaki 'hologram.png' isminin GitHub'a yüklediğiniz resimle AYNI olduğundan emin olun!
+        # 1. DÖNEN HOLOGRAM RESMİ
+        # Dosya adını 'jarvis.png' olarak ayarladım çünkü GitHub'a öyle yüklediniz
         self.hologram = Image(
-            source='hologram.png', 
+            source='jarvis.png', 
             pos_hint={'center_x': 0.5, 'center_y': 0.5},
-            size_hint=(0.8, 0.8)
+            size_hint=(0.9, 0.9)
         )
         self.layout.add_widget(self.hologram)
 
-        # 2. YAZI KATMANI
+        # 2. ALT YAZI
         self.status_label = Label(
-            text="[b]JARVIS CORE AKTİF[/b]",
+            text="[b]JARVIS SISTEMI AKTIF[/b]",
             markup=True,
-            font_size='24sp',
-            color=(0, 0.8, 1, 1),
-            pos_hint={'center_x': 0.5, 'center_y': 0.15}
+            font_size='22sp',
+            color=(0, 0.8, 1, 1), # Neon Mavi
+            pos_hint={'center_x': 0.5, 'center_y': 0.1}
         )
         self.layout.add_widget(self.status_label)
 
-        # HAREKETİ BAŞLAT: Her saniye 60 kez resmi döndür
+        # Resmi saniyede 60 kez döndürerek hareket sağlıyoruz
         Clock.schedule_interval(self.dondur, 1.0 / 60.0)
         
         return self.layout
 
     def dondur(self, dt):
-        # Resmi her karede 1 derece döndürür
+        # Her karede 1 derece döner
         self.hologram.rotation += 1
 
 if __name__ == "__main__":
     JarvisApp().run()
-
